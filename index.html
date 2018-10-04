@@ -3,6 +3,7 @@
   <head>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <title>Twiddler</title>
   </head>
   <body>
     <script>
@@ -11,14 +12,31 @@
         var $body = $('body');
         $body.html('');
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
+        function addTweets(idx) {
+          var tweet = streams.home[idx];
           var $tweet = $('<div></div>');
           $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
+          $tweet.prependTo($body);
         }
+        
+        var initIndex = 0;
+        while (initIndex <= streams.home.length - 1) {
+          addTweets(initIndex);
+          initIndex += 1;
+        }
+
+        let currIndex = streams.home.length;
+        function addNewTweets() {
+          while (currIndex <= streams.home.length - 1) {
+            addTweets(currIndex);
+            currIndex += 1;
+            $('#refr').prependTo($body);
+          }
+        }
+
+        $body.prepend("<button>Click to refresh Tweets</button>");
+        $('button').addClass('btn').attr("id", "refr");;
+        $('#refr').click(addNewTweets);
 
       });
 
