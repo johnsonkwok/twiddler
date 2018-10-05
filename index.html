@@ -14,8 +14,11 @@
 
         function addTweets(idx) {
           var tweet = streams.home[idx];
+          const timestamp = tweet.created_at.toLocaleTimeString('en-US');
           var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
+          const nameDisplay = $('<span></span>').html('<b>' + tweet.user + ' </b>');
+          nameDisplay.addClass('info').append('<small>@' + tweet.user + ' &#8231; ' + timestamp + '</small>');
+          $tweet.prepend(nameDisplay).append('<p>' + tweet.message + '</p>');
           $tweet.prependTo($body);
         }
         
