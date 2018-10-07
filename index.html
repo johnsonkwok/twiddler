@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Twiddler</title>
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
-    <title>Twiddler</title>
+    <style>
+      
+    </style>
   </head>
   <body>
     <script>
@@ -12,34 +15,52 @@
         var $body = $('body');
         $body.html('');
 
-        function addTweets(idx) {
-          var tweet = streams.home[idx];
+        function addTweets(tweetsArr, idx) {
+          var tweet = tweetsArr[idx];
           const timestamp = tweet.created_at.toLocaleTimeString('en-US');
           var $tweet = $('<div></div>');
-          const nameDisplay = $('<span></span>').html('<b>' + tweet.user + ' </b>');
-          nameDisplay.addClass('info').append('<small>@' + tweet.user + ' &#8231; ' + timestamp + '</small>');
+          const nameDisplay = $('<span></span>').html('<b>' + tweet.user + '</b>');
+          nameDisplay.addClass('handle').append(' @' + tweet.user);
           $tweet.prepend(nameDisplay).append('<p>' + tweet.message + '</p>');
+          nameDisplay.after('<small> &#8901; ' + timestamp + '</small>');
           $tweet.prependTo($body);
         }
         
         var initIndex = 0;
-        while (initIndex <= streams.home.length - 1) {
-          addTweets(initIndex);
+        const homeStream = streams.home;
+        while (initIndex < homeStream.length) {
+          addTweets(homeStream, initIndex);
           initIndex += 1;
         }
 
-        let currIndex = streams.home.length;
+        let currIndex = homeStream.length;
         function addNewTweets() {
-          while (currIndex <= streams.home.length - 1) {
-            addTweets(currIndex);
+          while (currIndex <= homeStream.length - 1) {
+            addTweets(homeStream, currIndex);
             currIndex += 1;
             $('#refr').prependTo($body);
           }
         }
 
-        $body.prepend("<button>Click to refresh Tweets</button>");
-        $('button').addClass('btn').attr("id", "refr");;
+        $body.prepend('<button>Click to refresh Tweets</button>');
+        $('button').addClass('btn').attr('id', 'refr');;
         $('#refr').click(addNewTweets);
+
+        function displayUserTweets(user) {
+          $('div').remove();
+          const userStream = streams.users[user];
+          let currUserIdx = 0;
+          while (currUserIdx < userStream.length) {
+            addTweets(userStream, currUserIdx);
+            currUserIdx += 1;
+          }
+        }
+
+        $body.on('click', '.handle', function() {
+          console.log(this);
+          const userToDisplay = $(this).children('b').text();
+          displayUserTweets(userToDisplay);
+        });
 
       });
 
