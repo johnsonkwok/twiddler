@@ -13,8 +13,10 @@
 
       $(document).ready(function(){
         var $body = $('body');
-        $body.html('');
-
+        const $button = $('<button></button>');
+        const homeStream = streams.home;
+        addHomeTweets();
+        
         function addTweets(tweetsArr, idx) {
           var tweet = tweetsArr[idx];
           const timestamp = tweet.created_at.toLocaleTimeString('en-US');
@@ -24,13 +26,6 @@
           $tweet.prepend(nameDisplay).append('<p>' + tweet.message + '</p>');
           nameDisplay.after('<small> &#8901; ' + timestamp + '</small>');
           $tweet.prependTo($body);
-        }
-        
-        var initIndex = 0;
-        const homeStream = streams.home;
-        while (initIndex < homeStream.length) {
-          addTweets(homeStream, initIndex);
-          initIndex += 1;
         }
 
         let currIndex = homeStream.length;
@@ -42,22 +37,40 @@
           }
         }
 
-        $body.prepend('<button>Click to refresh Tweets</button>');
-        $('button').addClass('btn').attr('id', 'refr');;
-        $('#refr').click(addNewTweets);
+        function addHomeTweets() {
+          $body.html('');
+          var initIndex = 0;
+          while (initIndex < homeStream.length) {
+            addTweets(homeStream, initIndex);
+            initIndex += 1;
+          }
+          addRefreshBtn();
+        }
+
+        function addRefreshBtn() {
+          $body.prepend($button);
+          $('button').text('Click to refresh Tweets').addClass('btn').attr('id', 'refr');;
+          $('#refr').click(addNewTweets);
+        }
+
+        function addHomeButton() {
+          $button.text('Home').prependTo($body);
+          $('button').addClass('btn').attr('id', 'home');
+          $('#home').click(addHomeTweets);
+        }
 
         function displayUserTweets(user) {
-          $('div').remove();
+          $body.empty();
           const userStream = streams.users[user];
           let currUserIdx = 0;
           while (currUserIdx < userStream.length) {
             addTweets(userStream, currUserIdx);
             currUserIdx += 1;
           }
+          addHomeButton();
         }
 
         $body.on('click', '.handle', function() {
-          console.log(this);
           const userToDisplay = $(this).children('b').text();
           displayUserTweets(userToDisplay);
         });
