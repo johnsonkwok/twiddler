@@ -2,18 +2,42 @@
 <html>
   <head>
     <title>Twiddler</title>
+    <meta charset="utf-8">
     <script src="jquery.js"></script>
     <script src="data_generator.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700" rel="stylesheet">
+    
     <style>
-      
+      body {
+        font-family: 'Roboto', Arial, sans-serif;
+        padding: 0;
+        margin: 0;
+      }
+      header {
+        padding: 15px 0 10px 0;
+        border-bottom: 1px solid #dae0e4;
+        background-color: #1da1f224;
+      }
+      .btn {
+        margin: 0 5px;
+      }
+      #home {
+        margin-left: 10px;
+      }
+      div {
+        margin: 0 10px;
+      }
+      p {
+        margin: 0 auto;
+      }
     </style>
+
   </head>
   <body>
     <script>
 
       $(document).ready(function(){
         var $body = $('body');
-        const $button = $('<button></button>');
         const homeStream = streams.home;
         addHomeTweets();
         
@@ -25,7 +49,7 @@
           nameDisplay.addClass('handle').append(' @' + tweet.user);
           $tweet.prepend(nameDisplay).append('<p>' + tweet.message + '</p>');
           nameDisplay.after('<small> &#8901; ' + timestamp + '</small>');
-          $tweet.prependTo($body);
+          $tweet.prependTo('main');
         }
 
         let currIndex = homeStream.length;
@@ -33,34 +57,37 @@
           while (currIndex <= homeStream.length - 1) {
             addTweets(homeStream, currIndex);
             currIndex += 1;
-            $('#refr').prependTo($body);
+            $('#refr').prependTo('header');
+            $('#home').prependTo('header');
           }
         }
 
         function addHomeTweets() {
-          $body.html('');
+          $body.html('<header></header><main></main>');
           var initIndex = 0;
           while (initIndex < homeStream.length) {
             addTweets(homeStream, initIndex);
             initIndex += 1;
           }
           addRefreshBtn();
+          addHomeButton();
         }
 
         function addRefreshBtn() {
-          $body.prepend($button);
-          $('button').text('Click to refresh Tweets').addClass('btn').attr('id', 'refr');;
+          $('<span></span>').prependTo('header');
+          $('header span').attr('id', 'refr').html('<button></button>');
+          $('button').text('Click to refresh Tweets').addClass('btn');;
           $('#refr').click(addNewTweets);
         }
 
         function addHomeButton() {
-          $button.text('Home').prependTo($body);
-          $('button').addClass('btn').attr('id', 'home');
+          $('<button></button>').text('Home').prependTo('header');
+          $('header button:first').addClass('btn').attr('id', 'home');
           $('#home').click(addHomeTweets);
         }
 
         function displayUserTweets(user) {
-          $body.empty();
+          $body.html('<header></header><main></main>');
           const userStream = streams.users[user];
           let currUserIdx = 0;
           while (currUserIdx < userStream.length) {
