@@ -18,14 +18,26 @@
         border-bottom: 1px solid #dae0e4;
         background-color: #1da1f224;
       }
+      .grid {
+        display: grid;
+        grid-auto-flow: row;
+        grid-gap: 1px;
+        /* grid-template-columns: 100px 400px; */
+      }
       .btn {
         margin: 0 5px;
       }
       #home {
         margin-left: 10px;
       }
+      div:first-of-type {
+        margin-top: 5px;
+      }
       div {
-        margin: 0 10px;
+        padding-bottom: 5px;
+        margin-left: 12px;
+        margin-bottom: 5px;
+        border-bottom: 1px solid #f0f4f6;
       }
       p {
         margin: 0 auto;
@@ -38,6 +50,7 @@
 
       $(document).ready(function(){
         var $body = $('body');
+        let visitor;
         const homeStream = streams.home;
         addHomeTweets();
         
@@ -49,7 +62,7 @@
           nameDisplay.addClass('handle').append(' @' + tweet.user);
           $tweet.prepend(nameDisplay).append('<p>' + tweet.message + '</p>');
           nameDisplay.after('<small> &#8901; ' + timestamp + '</small>');
-          $tweet.prependTo('main');
+          $tweet.prependTo('.tweets');
         }
 
         let currIndex = homeStream.length;
@@ -63,7 +76,10 @@
         }
 
         function addHomeTweets() {
-          $body.html('<header></header><main></main>');
+          $body.html('<header></header><main><section></section><section></section></main>');
+          $('section:first').addClass('profile');
+          $('section:last').addClass('tweets');
+          $('main').addClass('grid');
           var initIndex = 0;
           while (initIndex < homeStream.length) {
             addTweets(homeStream, initIndex);
@@ -71,12 +87,13 @@
           }
           addRefreshBtn();
           addHomeButton();
+          createProfile();
         }
 
         function addRefreshBtn() {
           $('<span></span>').prependTo('header');
           $('header span').attr('id', 'refr').html('<button></button>');
-          $('button').text('Click to refresh Tweets').addClass('btn');;
+          $('button').text('Refresh Tweets').addClass('btn');;
           $('#refr').click(addNewTweets);
         }
 
@@ -87,7 +104,9 @@
         }
 
         function displayUserTweets(user) {
-          $body.html('<header></header><main></main>');
+          $body.html('<header></header><main><section></section></main>');
+          $('section').addClass('tweets');
+          $('main').addClass('grid');
           const userStream = streams.users[user];
           let currUserIdx = 0;
           while (currUserIdx < userStream.length) {
@@ -96,6 +115,41 @@
           }
           addHomeButton();
         }
+
+        function createProfile() {
+          $('.profile').html('<h1></h1><h2></h2><span></span><form></form>');
+
+          if (visitor === undefined) {
+            $('form').attr('id', 'user-form').html('<label></label>');
+            $('<input><input>').appendTo('#user-form');
+            $('#user-form label').attr('for', 'user-id').text('Please enter User ID');
+            $('#user-form input:first').attr({
+              'type': 'text',
+              'id': 'user-id',
+              'placeholder': 'enter text here',
+              'required': true
+            });
+            $('#user-form input:last').attr({
+              'type': 'submit',
+              'value': 'Submit',
+              'class': 'btn'
+            });
+          } else {
+            fillProfile();
+          }
+        }
+
+        function fillProfile() {
+          $('.profile h1').text(visitor);
+          $('.profile h2').text('@' + visitor);
+          $('.profile span').html('&#8862; Joined ' + (new Date()).toUTCString().substring(8, 16));
+          $('form').remove();
+        }
+
+        $body.on('submit', '#user-form', function() {
+          visitor = $('#user-id').val();
+          fillProfile();
+        });
 
         $body.on('click', '.handle', function() {
           const userToDisplay = $(this).children('b').text();
