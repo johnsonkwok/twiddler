@@ -20,10 +20,19 @@
       }
       .btn {
         margin: 0 5px;
-        border-radius: 0px;
+        border: 1px solid;
 	      cursor: pointer;
-        font-weight: 400;
-        letter-spacing: .25px;
+        font-size: 18px;
+        letter-spacing: 1px;
+        border-radius: 5px;
+        color: #126091;
+        background-color: #fff;
+        line-height: 1.75;
+        font-weight: 700;
+        box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.15);;
+      }
+      .btn:hover {
+        background-color: rgb(202, 215, 221);
       }
 
       /* Header section */
@@ -31,26 +40,30 @@
         padding-bottom: 5px;
         border-bottom: 1px solid #bac0c4;
         background-color: #1da1f2;
+        width: 100%;
       }
       #btn-header {
         display: inline-block;
         margin-left: 10px;
-        margin-top: 70px;
+        margin-top: 150px;
       }
       #logo {
         position: fixed;
+        z-index: 2;
         margin: 0;
         padding: 0;
-        height: 30px;
+        height: 40px;
         width: 100%;
         background-color: #ffffff;
+        border-bottom: 1px solid rgba(34, 34, 34, 0.7);
       }
       #logo img {
         position: relative;
         bottom: 5px;
         left: 45%;
-        width: 25px;
-        height: 20px;
+        top: 1px;
+        width: 27px;
+        height: 22px;
       }
 
       /* Main section with profile and tweet stream */
@@ -58,18 +71,52 @@
         display: grid;
         grid-auto-flow: row;
         grid-gap: 1px;
-        grid-template-columns: minmax(150px, 250px) 500px;
+        grid-template-columns: minmax(150px, 300px) 500px;
+      }
+      .handle, #visitor {
+        cursor: pointer;
+      }
+      .handle b:hover, #visitor:hover {
+        text-decoration: underline;
       }
 
       /* Profile section */
+      .profile {
+        margin-left: 15px;
+        overflow: hidden;
+      }
+      #user-form {
+        font-size: 22px;
+        font-weight: 700;
+        color: rgb(255, 15, 15);
+      }
       #user-id {
         font-style: italic;
-        /* box-sizing: border-box;
-        height: 80px;
-        vertical-align: top;
-        text-align: left;
-        overflow-wrap: break-word;
-        word-break: break-word; */
+        font-size: 18px;
+        line-height: 1.5;
+        width: 75%;
+        margin: 10px 0;
+      }
+      #user-submit {
+        position: relative;
+        z-index: 1;
+        float: right;
+        right: 3.5em;
+        overflow: hidden;
+      }
+      #visitor {
+        font-size: 2em;
+        padding-top: 15px;
+        margin-bottom: 10px;
+      }
+      .profile h2 {
+        font-weight: 300;
+        font-size: 1.5em;
+        margin-bottom: 7px;
+      }
+      .profile span {
+        display: block;
+        margin-bottom: 7px;
       }
 
       /* Tweet stream section */
@@ -78,29 +125,45 @@
       }
       #compose-area {
         resize: none;
+        font-size: 14px;
+        height: 2em;
+        margin-bottom: 5px;
+      }
+      #compose-area:focus, #compose-area:valid {
+        height: 6.5em;
       }
       #compose-tweet {
         display: block;
+        position: relative;
+        float: right;
+        right: 7%;
+        background-color: #1da0f2a1;
+        border-radius: 20px;
+        color: white;
+        font-size: 0.9em;
+        padding: 5px 18px;
+        border: 0;
+      }
+      #compose-tweet:hover {
+        background-color: #1da1f2;
       }
       #compose-sect {
-        padding-bottom: 5px;
+        padding-bottom: 44px;
         border-bottom: 1px solid #07222b75;
-        width: 440px;
-      }
-      .handle {
-        cursor: pointer;
+        width: 100%;
       }
       .tweets div:first-of-type {
-        margin-top: 5px;
+        margin-top: 12px;
       }
       .tweets div {
         width: 500px;
         padding-bottom: 5px;
         margin-bottom: 5px;
-        border-bottom: 1px solid #f0f4f6f5;
+        border-bottom: 1px solid #c0c0c069;
       }
       p {
         margin: 0 auto;
+        font-size: large;
       }
     </style>
 
@@ -157,7 +220,7 @@
 
         function addRefreshBtn() {
           $('<button></button>').appendTo('#btn-header')
-          $('#btn-header button:last').text('Refresh Tweets').addClass('btn').attr('id', 'refr');
+          $('#btn-header button:last').text('Refresh').addClass('btn').attr('id', 'refr');
           $('#refr').click(addNewTweets);
         }
 
@@ -200,9 +263,9 @@
               'type': 'text',
               'id': 'user-id',
               'minlength': '1',
-              'maxlength': '20',
+              'maxlength': '14',
               'required': 'true',
-              'placeholder': 'max 20 characters',
+              'placeholder': 'max 14 characters',
             });
             $('#user-form input:last').attr({
               'type': 'submit',
@@ -217,10 +280,10 @@
         }
 
         function fillProfile() {
-          $('.profile h1').text(visitor);
+          $('.profile h1').text(visitor).attr('id', 'visitor');
           $('.profile h2').text('@' + visitor);
           $('.profile span:first').html('&#8862; Joined ' + (new Date()).toUTCString().substring(8, 16));
-          $('.profile span:last').html('Tweets: ' + streams.users[visitor].length).attr('id', 'tweet-count');
+          $('.profile span:last').html('&#10569; Tweets: ' + streams.users[visitor].length).attr('id', 'tweet-count');
           $('.profile form').remove();
         }
 
@@ -233,6 +296,7 @@
             'cols': '58',
             'minlength': '1',
             'maxlength': '280',
+            'required': 'true',
             'placeholder': 'What\'s happening?',
             'wrap': 'hard',
           });
@@ -277,6 +341,11 @@
         
         $body.on('click', '.handle', function() {
           const userToDisplay = $(this).children('b').text();
+          displayUserTweets(userToDisplay);
+        });
+
+        $body.on('click', '#visitor', function() {
+          const userToDisplay = $(this).text();
           displayUserTweets(userToDisplay);
         });
 
