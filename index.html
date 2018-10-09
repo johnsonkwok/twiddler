@@ -72,16 +72,29 @@
       }
 
       /* Tweet stream section */
+      #compose-sect, div {
+        margin-left: 12px;
+      }
+      #compose-area {
+        resize: none;
+      }
+      #compose-tweet {
+        display: block;
+      }
+      #compose-sect {
+        padding-bottom: 5px;
+        border-bottom: 1px solid #07222b75;
+        width: 440px;
+      }
       .handle {
         cursor: pointer;
       }
-      div:first-of-type {
+      .tweets div:first-of-type {
         margin-top: 5px;
       }
-      div {
+      .tweets div {
         width: 500px;
         padding-bottom: 5px;
-        margin-left: 12px;
         margin-bottom: 5px;
         border-bottom: 1px solid #f0f4f6f5;
       }
@@ -96,7 +109,7 @@
 
       $(document).ready(function(){
         var $body = $('body');
-        let visitor;
+        var visitor;
         const homeStream = streams.home;
         addHomeTweets();
         
@@ -117,6 +130,7 @@
             addTweets(homeStream, currIndex);
             currIndex += 1;
           }
+          $('#compose-sect').prependTo('.tweets');
         }
 
         function addHomeTweets() {
@@ -157,7 +171,7 @@
           $('header h1').attr('id', 'logo').html('<img>');
           $('#logo img').attr({
             'src': 'https://upload.wikimedia.org/wikipedia/fr/c/c8/Twitter_Bird.svg',
-            'alt': 'Twiddler Logo'
+            'alt': 'Twiddler Logo',
           });
         }
 
@@ -175,40 +189,91 @@
         }
 
         function createProfile() {
-          $('.profile').html('<h1></h1><h2></h2><span></span><form></form>');
+          $('.profile').html('<h1></h1><h2></h2><span></span><span></span><form></form>');
 
           if (visitor === undefined) {
-            $('form').attr('id', 'user-form').html('<label></label>');
+            $('.profile form').attr('id', 'user-form').html('<label></label>');
             $('<input><input>').appendTo('#user-form');
             $('#user-form label').attr('for', 'user-id').text('Please enter User ID');
             $('#user-form input:first').attr({
               'type': 'text',
               'id': 'user-id',
-              'placeholder': 'enter text here',
-              'required': true
+              'minlength': '1',
+              'maxlength': '20',
+              'required': 'true',
+              'placeholder': 'max 20 characters',
             });
             $('#user-form input:last').attr({
               'type': 'submit',
+              'id': 'user-submit',
               'value': 'Submit',
-              'class': 'btn'
+              'class': 'btn',
             });
           } else {
             fillProfile();
+            addComposeTweetSect();
           }
         }
 
         function fillProfile() {
           $('.profile h1').text(visitor);
           $('.profile h2').text('@' + visitor);
-          $('.profile span').html('&#8862; Joined ' + (new Date()).toUTCString().substring(8, 16));
-          $('form').remove();
+          $('.profile span:first').html('&#8862; Joined ' + (new Date()).toUTCString().substring(8, 16));
+          $('.profile span:last').html('Tweets: ' + streams.users[visitor].length).attr('id', 'tweet-count');
+          $('.profile form').remove();
         }
+
+        function addComposeTweetSect() {
+          $('<div id="compose-sect"></div>').prependTo('.tweets');
+          $('#compose-sect').html('<textarea></textarea><button>');
+          $('#compose-sect textarea').attr({
+            'id': 'compose-area',
+            'rows': '5',
+            'cols': '58',
+            'minlength': '1',
+            'maxlength': '280',
+            'placeholder': 'What\'s happening?',
+            'wrap': 'hard',
+          });
+          $('#compose-sect button').text('Tweet').attr({
+            'type': 'submit',
+            'class': 'btn',
+            'id': 'compose-tweet',
+          });
+        }
+        
+        // Function provided by data_generator.js file
+        var writeTweet = function(message){
+          if(!visitor){
+            throw new Error('set the global visitor property!');
+          }
+          var tweet = {};
+          tweet.user = visitor;
+          tweet.message = message;
+          tweet.created_at = new Date();   // this line added by Johnson Kwok
+          addTweet(tweet);
+        };
 
         $body.on('submit', '#user-form', function() {
           visitor = $('#user-id').val();
+          streams.users[visitor] = [];
           fillProfile();
+          addComposeTweetSect();
         });
 
+        $body.on('click', '#compose-tweet', function() {
+          const tweetText = $('#compose-area');
+          if (tweetText.val() !== '') {
+            writeTweet(tweetText.val());
+            tweetText.val('');
+            addNewTweets();
+            fillProfile();
+            $('#compose-area').attr('placeholder', 'What\'s on your mind?');
+          } else {
+            $('#compose-area').attr('placeholder', 'Please enter something before tweeting.');
+          }
+        });
+        
         $body.on('click', '.handle', function() {
           const userToDisplay = $(this).children('b').text();
           displayUserTweets(userToDisplay);
