@@ -173,7 +173,6 @@
 
       $(document).ready(function(){
         var $body = $('body');
-        let visitor;
         const homeStream = streams.home;
         addHomeTweets();
         
@@ -255,7 +254,7 @@
         function createProfile() {
           $('.profile').html('<h1></h1><h2></h2><span></span><span></span><form></form>');
 
-          if (visitor === undefined) {
+          if (window.visitor === undefined) {
             $('.profile form').attr('id', 'user-form').html('<label></label>');
             $('<input><input>').appendTo('#user-form');
             $('#user-form label').attr('for', 'user-id').text('Please enter User ID');
@@ -280,11 +279,11 @@
         }
 
         function fillProfile() {
+          $('.profile form').remove();
           $('.profile h1').text(visitor).attr('id', 'visitor');
           $('.profile h2').text('@' + visitor);
           $('.profile span:first').html('&#8862; Joined ' + (new Date()).toUTCString().substring(8, 16));
           $('.profile span:last').html('&#10569; Tweets: ' + streams.users[visitor].length).attr('id', 'tweet-count');
-          $('.profile form').remove();
         }
 
         function addComposeTweetSect() {
@@ -306,18 +305,6 @@
             'id': 'compose-tweet',
           });
         }
-        
-        // Function provided by data_generator.js file
-        var writeTweet = function(message){
-          if(!visitor){
-            throw new Error('set the global visitor property!');
-          }
-          var tweet = {};
-          tweet.user = visitor;
-          tweet.message = message;
-          tweet.created_at = new Date();   // this line added by Johnson Kwok
-          addTweet(tweet);
-        };
 
         $body.on('submit', '#user-form', function() {
           visitor = $('#user-id').val();

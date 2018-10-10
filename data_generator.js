@@ -16,6 +16,10 @@ window.users = Object.keys(streams.users);
 // utility function for adding tweets to our data structures
 var addTweet = function(newTweet){
   var username = newTweet.user;
+  // Did not need to add the code below, accounted for when <button> with id "user-submit" is clicked (refer to index.html file)
+  // if (!streams.users.hasOwnProperty(username)) {
+  //   streams.users[username] = [];
+  // }
   streams.users[username].push(newTweet);
   streams.home.push(newTweet);
 };
@@ -56,17 +60,16 @@ var scheduleNextTweet = function(){
 };
 scheduleNextTweet();
 
-// *The writeTweet function was moved to the <script> section of index.html*
-//
+
 // utility function for letting students add "write a tweet" functionality
 // (note: not used by the rest of this file.)
-// var writeTweet = function(message){
-//   if(!visitor){
-//     throw new Error('set the global visitor property!');
-//   }
-//   var tweet = {};
-//   tweet.user = visitor;
-//   tweet.message = message;
-//   tweet.created_at = new Date();   // this line added by Johnson Kwok
-//   addTweet(tweet);
-// };
+var writeTweet = function(message){
+  if(!visitor){
+    throw new Error('set the global visitor property!');
+  }
+  var tweet = {};
+  tweet.user = visitor;
+  tweet.message = message;
+  tweet.created_at = new Date();   // this line added by Johnson Kwok
+  addTweet(tweet);
+};
